@@ -1,6 +1,7 @@
 gsap.registerPlugin(ScrollTrigger);
 
 const imageContainer = document.querySelectorAll(".rg__column");
+const fillBg = document.querySelector(".fill-background");
 
 const navbar = () => {
   //  ! Adding class to slide bottom of <a></a>
@@ -35,7 +36,6 @@ const navbar = () => {
 
   ScrollTrigger.create({
     start: 100, //! Start After 100px of scroll
-    markers: true,
     end: "bottom bottom-=200",
     toggleClass: {
       targets: "body",
@@ -107,6 +107,7 @@ const revealImage = () => {
     container.textCopy = container.querySelector(".rg__text--copy");
     container.textCopyMask = container.querySelector(".rg__text--mask");
     container.textCopyMaskPara = container.querySelector(".rg__text--mask p");
+    container.bgClolor = container.dataset.color;
 
     // ! Moving away the mask and image container
     gsap.set([container.imageBlock, container.textCopyMask], {
@@ -139,6 +140,7 @@ const hoverSectionReveal = (e) => {
     textCopyMaskPara,
     textCopyMask,
     image,
+    bgClolor,
   } = e.target;
 
   // ! Making TimeLine
@@ -176,7 +178,8 @@ const hoverSectionReveal = (e) => {
           duration: 1.2,
         },
         0
-      );
+      )
+      .to(fillBg, { backgroundColor: "#ACB7AE", ease: "none", duration: 1 });
   }
 
   // ! Checcking Event Type
@@ -199,24 +202,136 @@ const hoverSectionReveal = (e) => {
           duration: 1.2,
         },
         0
-      );
+      )
+      .to(fillBg, { backgroundColor: bgClolor, ease: "none", duration: 1 }, 0);
   }
 };
+
+// ! PortFolio function of link hover and image
+// ! DOM ELEMENTS NEDDED
+const linksContainer = document.querySelector(".portfolio__categories");
+const links = document.querySelectorAll(".portfolio__categories a");
+const imageL = document.querySelector(".portfolio__image--l");
+const Linside = document.querySelector(".portfolio__image--l .image_inside");
+const imageS = document.querySelector(".portfolio__image--s");
+const Sinside = document.querySelector(".portfolio__image--s .image_inside");
+
+const portFolio = () => {
+  links.forEach((link) => {
+    link.addEventListener("mouseenter", portfolioHover);
+    link.addEventListener("mouseleave", portfolioHover);
+    link.addEventListener("mousemove", portfolioMove);
+  });
+};
+
+const portfolioMove = (e) => {
+  const containerHeight = () => linksContainer.clientHeight;
+  gsap.to(imageL, {
+    y: -(containerHeight() - e.clientY) / 8,
+    duration: 1.2,
+    ease: "Power3.inOut",
+  });
+  gsap.to(imageS, {
+    y: -(containerHeight() - e.clientY) / 4,
+    duration: 1.5,
+    ease: "Power3.inOut",
+  });
+};
+
+const portfolioHover = (e) => {
+  const { imagelarge, color, imagesmall } = e.target.dataset;
+  const tl = gsap.timeline();
+
+  if (e.type === "mouseenter") {
+    console.log("ENER");
+
+    // ! Filtering the current hover node element
+
+    const siblings = Array.from(links).filter((link) => link !== e.target);
+
+    // ! Creating Timeline
+    tl.set(Linside, { backgroundImage: `url(${imagelarge})` })
+      .set(Sinside, {
+        backgroundImage: `url(${imagesmall})`,
+      })
+      .to(
+        [imageL, imageS],
+        {
+          autoAlpha: 1,
+          duration: 1,
+        },
+        0
+      )
+      .to(siblings, { color: "#fff", autoAlpha: 0.2 }, 0)
+      .to(e.target, { color: "#fff", autoAlpha: 1 }, 0)
+      .to(fillBg, { backgroundColor: color, duration: 1 }, 0);
+  }
+
+  if (e.type === "mouseleave") {
+    gsap.killTweensOf([imageL, imageS]);
+
+    tl.to(
+      [imageL, imageS],
+      {
+        autoAlpha: 0,
+      },
+      0
+    )
+      .to(links, { color: "#000", autoAlpha: 1 }, 0)
+      .to(fillBg, { backgroundColor: "#ACB7AE", duration: 1 }, 0);
+  }
+};
+
+// ! Parallax Image on scroll
+const parallax = () => {
+  const paralllaxContainer = document.querySelectorAll(".with-parallax");
+  paralllaxContainer.forEach((parallax) => {
+    const image = parallax.querySelector("img");
+    const imageContainer = image.parentElement;
+
+    gsap.to(image, {
+      yPercent: 20,
+      ease: "none",
+      scrollTrigger: {
+        trigger: imageContainer,
+        strat: "top bottom",
+        scrub: 1,
+        markers: true,
+      },
+    });
+  });
+};
+
+// ! PINNING the navbar of parallax
+
+const pinParallaxNav = () => [
+  ScrollTrigger.create({
+    trigger: ".fixed-nav",
+    start: "top center",
+    pin: true,
+    endTrigger: "#stage4",
+    end: "center center",
+    markers: true,
+  }),
+];
 
 function init() {
   navbar();
   imageToTilt();
-  // revealImage();
+  revealImage();
+  portFolio();
+  parallax();
+  pinParallaxNav();
 }
-
-window.addEventListener("load", function () {
-  init();
-});
 
 const mq = window.matchMedia("(min-width: 768px)");
 console.log(mq);
 
 mq.addEventListener("change", handleChange);
+
+window.addEventListener("load", function () {
+  handleChange(mq);
+});
 
 // ! RESET ALL PROPS
 
@@ -244,6 +359,7 @@ function handleChange(e) {
         textCopyMask,
         image,
       } = container;
+      // ! Reseting Props
       resetProps([
         imageBlock,
         imageMask,
@@ -255,6 +371,6 @@ function handleChange(e) {
       ]);
     });
   } else {
-    revealImage();
+    init();
   }
 }
