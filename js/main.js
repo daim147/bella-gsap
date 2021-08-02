@@ -296,7 +296,7 @@ const parallax = () => {
         trigger: imageContainer,
         strat: "top bottom",
         scrub: 1,
-        markers: true,
+        // markers: true,
       },
     });
   });
@@ -304,16 +304,43 @@ const parallax = () => {
 
 // ! PINNING the navbar of parallax
 
-const pinParallaxNav = () => [
+const pinParallaxNav = () => {
   ScrollTrigger.create({
     trigger: ".fixed-nav",
     start: "top center",
     pin: true,
     endTrigger: "#stage4",
     end: "center center",
-    markers: true,
-  }),
-];
+    // markers: true,
+  });
+
+  const stages = document.querySelectorAll(".stage");
+  const links = document.querySelectorAll(".fixed-nav li");
+  stages.forEach((stage, index) => {
+    ScrollTrigger.create({
+      trigger: stage,
+      start: "top center",
+      end: () => `+=${stage.clientHeight + window.innerHeight / 10}`,
+      toggleClass: {
+        targets: links[index],
+        className: "is-active",
+      },
+      onEnter: () => {
+        gsap.to(fillBg, {
+          backgroundColor: stage.dataset.color,
+          duration: 0.5,
+        });
+      },
+      onEnterBack: () => {
+        gsap.to(fillBg, {
+          backgroundColor: stage.dataset.color,
+          duration: 0.5,
+        });
+      },
+      // markers: true,
+    });
+  });
+};
 
 function init() {
   navbar();
