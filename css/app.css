@@ -25,7 +25,27 @@
 body {
   font: 16px/1.7 "Source Sans Pro", Helvetica, Helvetica Neue, Arial, sans-serif;
   color: var(--text-dark-color);
+  overflow-y: scroll;
 }
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+#viewPort {
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  overflow: hidden;
+}
+
+/* #scroll-container {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+} Custom SMOOTH SCROLL */
 
 /* =Top Nav */
 .logo {
@@ -429,7 +449,7 @@ header h1 span {
   justify-content: center;
   align-items: center;
   background: transparent;
-  visibility: hidden; /* hide loader content by default */
+  /* visibility: hidden;  */
 }
 .loader__title {
   font-size: 7vw;
@@ -548,7 +568,7 @@ section {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: red;
+  background-color: #acb7ae;
   position: fixed;
 }
 

@@ -1,7 +1,9 @@
 gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollToPlugin);
 
 const imageContainer = document.querySelectorAll(".rg__column");
 const fillBg = document.querySelector(".fill-background");
+let smoothScroll;
 
 const navbar = () => {
   //  ! Adding class to slide bottom of <a></a>
@@ -72,8 +74,8 @@ const tilt = (e) => {
       duration: 1.2,
       x: xPos * 40 * (index * 1.2 + 0.5),
       y: yPos * 20 * (index * 1.2 + 0.5),
-      rotateX: xPos * 10,
-      rotateY: yPos * 40,
+      rotateX: yPos * 10,
+      rotateY: xPos * 40,
       ease: "Power3.out",
     });
   });
@@ -82,8 +84,8 @@ const tilt = (e) => {
       duration: 1.2,
       x: xPos * 40 * (index * 1.2 + 0.5),
       y: -(yPos * 30 * (index * 1.2 + 0.5)),
-      rotateX: xPos * 10,
-      rotateY: yPos * 40,
+      rotateX: yPos * 10,
+      rotateY: xPos * 40,
       ease: "Power3.out",
     });
   });
@@ -227,13 +229,13 @@ const portFolio = () => {
 const portfolioMove = (e) => {
   const containerHeight = () => linksContainer.clientHeight;
   gsap.to(imageL, {
-    y: -(containerHeight() - e.clientY) / 8,
+    y: -(containerHeight() - e.clientY) / 6,
     duration: 1.2,
     ease: "Power3.inOut",
   });
   gsap.to(imageS, {
-    y: -(containerHeight() - e.clientY) / 4,
-    duration: 1.5,
+    y: -(containerHeight() - e.clientY) / 3,
+    duration: 0.8,
     ease: "Power3.inOut",
   });
 };
@@ -309,6 +311,7 @@ const pinParallaxNav = () => {
     trigger: ".fixed-nav",
     start: "top center",
     pin: true,
+    pinReparent: true,
     endTrigger: "#stage4",
     end: "center center",
     // markers: true,
@@ -342,13 +345,56 @@ const pinParallaxNav = () => {
   });
 };
 
+// !  SCROLL to specific section
+
+const scrollTo = () => {
+  const links = document.querySelectorAll(".fixed-nav li a");
+
+  links.forEach((link) => {
+    const target = link.getAttribute("href");
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      // ! using smooth scroll to navigate to specific link
+      smoothScroll.scrollIntoView(document.querySelector(target), {
+        damping: 0.04,
+        renderByPixels: true,
+      });
+    });
+  });
+};
+
+const smoothScrollBar = () => {
+  // ! Adding smooth scroll behavior
+  smoothScroll = Scrollbar.init(document.querySelector("#viewPort"), {
+    damping: 0.04,
+    renderByPixels: true,
+  });
+
+  smoothScroll.track.xAxis.element.remove();
+
+  // ! Making greensock scrolltrigger know about smooth scrolling
+  ScrollTrigger.scrollerProxy(document.body, {
+    scrollTop(value) {
+      if (arguments.length) {
+        smoothScroll.scrollTop = value; // setter
+      }
+      return smoothScroll.scrollTop; // getter
+    },
+  });
+
+  //! when the smooth scroller updates, tell ScrollTrigger to update() too:
+  smoothScroll.addListener(ScrollTrigger.update);
+};
+
 function init() {
+  smoothScrollBar();
   navbar();
   imageToTilt();
   revealImage();
   portFolio();
   parallax();
   pinParallaxNav();
+  scrollTo();
 }
 
 const mq = window.matchMedia("(min-width: 768px)");
@@ -401,3 +447,30 @@ function handleChange(e) {
     init();
   }
 }
+
+// ! Custom SMOOTH SCROLL
+// const main = document.querySelector("#scroll-container");
+// const html = document.querySelector("html");
+// let height;
+// const setHeight = () => {
+//   height = main.clientHeight;
+//   document.body.style.height = `${height}px`;
+//   console.log("TRIGGERS", height);
+// };
+
+// ScrollTrigger.addEventListener("refreshInit", setHeight);
+
+// gsap.to(main, {
+//   ease: "none",
+//   y: () => {
+//     return -(height - document.documentElement.clientHeight);
+//   },
+//   scrollTrigger: {
+//     trigger: document.body,
+//     start: "top top",
+//     end: "bottom bottom",
+//     scrub: 1,
+//     invalidateOnRefresh: true,
+//     markers: true,
+//   },
+// });
