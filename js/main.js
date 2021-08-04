@@ -1,7 +1,56 @@
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(ScrollToPlugin);
 
+const main = document.querySelector("#main");
 const imageContainer = document.querySelectorAll(".rg__column");
+const loaderPage = document.querySelector(".loader");
+const loaderInner = document.querySelector(".loader .inner");
+const loaderProgress = document.querySelector(".loader .progress");
+
+//! LOADING PAGE
+gsap.set(loaderPage, { autoAlpha: 1 });
+gsap.set(loaderInner, { scaleY: 0.005, transformOrigin: "bottom" });
+const progressTween = gsap.to(loaderProgress, {
+  scaleX: 0,
+  paused: true,
+  transformOrigin: "right",
+});
+
+// ! Setting Up Image Load
+
+let imageLoad = 0,
+  imgCount;
+
+const imageLoadFun = imagesLoaded(main);
+
+// ! SEtting images in  main and set to imageCount
+imgCount = imageLoadFun.images.length;
+
+// ! INITAIL VALUE
+updateProgressBar(0);
+
+// ! PRogressing Image loaded
+imageLoadFun.on("progress", (instance, image) => {
+  //! IT will call on each image loaded
+  imageLoad++;
+  updateProgressBar(imageLoad);
+});
+
+// ! ON Complete Load of Images
+imageLoadFun.on("done", (instance) => {
+  gsap.set(loaderProgress, { autoAlpha: 0, onComplete: loader });
+});
+
+// ! Update Progress
+
+function updateProgressBar(value) {
+  gsap.to(progressTween, {
+    progress: value / imgCount,
+    duration: 0.3,
+    ease: "power2.out",
+  });
+}
+
 const fillBg = document.querySelector(".fill-background");
 let smoothScroll;
 
@@ -386,7 +435,103 @@ const smoothScrollBar = () => {
   smoothScroll.addListener(ScrollTrigger.update);
 };
 
+function loader() {
+  const loaderInner = document.querySelector(".loader .inner");
+  const mask = document.querySelector(".loader__image--mask");
+  const image = document.querySelector(".loader__image--mask img");
+  const line1 = document.querySelector(
+    ".loader__title--mask:nth-child(1) span"
+  );
+  const line2 = document.querySelector(
+    ".loader__title--mask:nth-child(2) span"
+  );
+  const lines = document.querySelectorAll(".loader__title--mask");
+  const loaderContent = document.querySelector(".loader__content");
+
+  // ! Loading In Timeline
+  const tlLoaderIn = gsap.timeline({
+    defaults: {
+      duration: 1.1,
+      ease: "power2.out",
+    },
+    onComplete: () => document.body.classList.remove("is-loading"),
+  });
+
+  tlLoaderIn
+    .set(loaderContent, { autoAlpha: 1 })
+    .to(
+      loaderInner,
+      {
+        scaleY: 1,
+        transformOrigin: "bottom",
+      },
+      0.2
+    )
+    .addLabel("revealImage")
+    .from(
+      mask,
+      {
+        yPercent: 100,
+      },
+      "revealImage-=0.6"
+    )
+    .from(
+      image,
+      {
+        yPercent: -80,
+      },
+      "revealImage-=0.6"
+    )
+    .from(
+      [line1, line2],
+      {
+        yPercent: 100,
+        stagger: 0.1,
+      },
+      "revealImage-=0.4"
+    );
+
+  // ! Loading Out Timeline
+  const tlLoaderOut = gsap.timeline({
+    defaults: {
+      duration: 1.2,
+      ease: "power2.out",
+    },
+    delay: 1,
+  });
+
+  tlLoaderOut
+    .to(
+      lines,
+      {
+        yPercent: -500,
+        stagger: 0.2,
+      },
+      0
+    )
+    .to(
+      [loaderPage, loaderContent],
+      {
+        yPercent: -100,
+      },
+      0.2
+    )
+    .from(
+      "#main",
+      {
+        y: 150,
+      },
+      0.2
+    );
+
+  //! Joining Timeline
+  const joinTween = gsap.timeline();
+
+  joinTween.add(tlLoaderIn).add(tlLoaderOut);
+}
+
 function init() {
+  // loader();
   smoothScrollBar();
   navbar();
   imageToTilt();
@@ -419,6 +564,7 @@ const resetProps = (elements) => {
 };
 
 function handleChange(e) {
+  console.log("CHANGE HAPPENS");
   if (!e.matches) {
     imageContainer.forEach((container) => {
       container.removeEventListener("mouseleave", hoverSectionReveal);

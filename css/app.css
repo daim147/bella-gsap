@@ -32,6 +32,14 @@ body {
   display: none;
 }
 
+.is-loading #main,
+.is-loading .logo,
+.is-loading .burger,
+.is-loading .main-nav,
+.is-loading .fill-background {
+  display: none;
+}
+
 #viewPort {
   top: 0;
   left: 0;
@@ -442,14 +450,24 @@ header h1 span {
 }
 .loader .inner {
   background-color: var(--bcg-loaderbluedark);
+  position: relative;
 }
+.loader .progress {
+  background-color: var(--bcg-lightblue);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--loader-width);
+  height: var(--loader-height);
+}
+
 .loader__content {
   z-index: 4;
   display: flex;
   justify-content: center;
   align-items: center;
   background: transparent;
-  /* visibility: hidden;  */
+  visibility: hidden;
 }
 .loader__title {
   font-size: 7vw;
