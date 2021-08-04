@@ -347,7 +347,6 @@ const parallax = () => {
         trigger: imageContainer,
         strat: "top bottom",
         scrub: 1,
-        markers: true,
       },
     });
   });
@@ -360,11 +359,9 @@ const pinParallaxNav = () => {
     trigger: ".fixed-nav",
     start: "top center",
     pin: true,
-    // pinReparent: true,
+    pinReparent: true,
     endTrigger: "#stage4",
     end: "center center",
-    onEnter: () => console.log("HYYY"),
-    markers: true,
   });
 
   const stages = document.querySelectorAll(".stage");
@@ -589,8 +586,6 @@ function handleChange(e) {
       ]);
     });
   } else {
-    console.log("CHANGE HAPPENS");
-
     init();
   }
 }
