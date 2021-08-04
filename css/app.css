@@ -37,7 +37,8 @@ body {
 .is-loading .burger,
 .is-loading .main-nav,
 .is-loading .fill-background {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
 }
 
 #viewPort {

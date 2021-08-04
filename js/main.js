@@ -347,7 +347,7 @@ const parallax = () => {
         trigger: imageContainer,
         strat: "top bottom",
         scrub: 1,
-        // markers: true,
+        markers: true,
       },
     });
   });
@@ -360,10 +360,11 @@ const pinParallaxNav = () => {
     trigger: ".fixed-nav",
     start: "top center",
     pin: true,
-    pinReparent: true,
+    // pinReparent: true,
     endTrigger: "#stage4",
     end: "center center",
-    // markers: true,
+    onEnter: () => console.log("HYYY"),
+    markers: true,
   });
 
   const stages = document.querySelectorAll(".stage");
@@ -406,7 +407,6 @@ const scrollTo = () => {
       // ! using smooth scroll to navigate to specific link
       smoothScroll.scrollIntoView(document.querySelector(target), {
         damping: 0.04,
-        renderByPixels: true,
       });
     });
   });
@@ -533,13 +533,13 @@ function loader() {
 function init() {
   // loader();
   smoothScrollBar();
+  pinParallaxNav();
+  parallax();
+  scrollTo();
   navbar();
   imageToTilt();
   revealImage();
   portFolio();
-  parallax();
-  pinParallaxNav();
-  scrollTo();
 }
 
 const mq = window.matchMedia("(min-width: 768px)");
@@ -564,7 +564,6 @@ const resetProps = (elements) => {
 };
 
 function handleChange(e) {
-  console.log("CHANGE HAPPENS");
   if (!e.matches) {
     imageContainer.forEach((container) => {
       container.removeEventListener("mouseleave", hoverSectionReveal);
@@ -590,6 +589,8 @@ function handleChange(e) {
       ]);
     });
   } else {
+    console.log("CHANGE HAPPENS");
+
     init();
   }
 }
